@@ -2,6 +2,10 @@
 
 ### The simplest and cleanest Docker image for running federation
 
+Define required `POSTGRES_USER` and `POSTGRES_PASSWORD` in `.env`
+
+    cp .env.example .env
+
 Build and run:
 
     docker-compose build

@@ -35,7 +35,7 @@ function init_federation_db() {
   psql -h federationpostgres -U $POSTGRES_USER federationdb -e <<-EOS
     CREATE TABLE people (id character varying, name character varying, domain character varying);
     INSERT INTO people (id, name, domain) VALUES
-      ('GCYQSB3UQDSISB5LKAL2OEVLAYJNIR7LFVYDNKRMLWQKDCBX4PU3Z6JP', 'steve', 'stellarkit.io')
+      ('GAFR4PN44KEP4QKBSXSIJGBX6JG67CTCIPYNQK6MEXCGOEBXWRGUOTBD', 'katopz', 'catcat.io')
 EOS
 
   touch $FEDERATION_HOME/.federationdb-initialized
