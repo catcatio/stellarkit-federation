@@ -1,37 +1,52 @@
-version:                    "3"
+version:                  "3"
 services:
   federationpostgres:
-      image:                postgres
-      container_name:       postgres-federation
-      restart:              unless-stopped
-      volumes:
-        - ~/stellar/federation/postgresql:/var/lib/postgresql/data
-      env_file: .env
-      environment:
-        POSTGRES_USER:      ${POSTGRES_USER}
-        POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
-        POSTGRES_DB:        ${POSTGRES_DB:-federationdb}
-      networks:
-          - default
-
+    image:                postgres
+    container_name:       postgres-federation
+    restart:              unless-stopped
+    volumes:
+      - ~/stellar/federation/postgresql:/var/lib/postgresql/data
+    env_file: .env
+    environment:
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+      POSTGRES_DB:        ${POSTGRES_DB:-federationdb}
+    networks:
+      - back
+  postgressadmin:
+    image:                fenglc/pgadmin4
+    container_name:       pgadmin4
+    restart:              unless-stopped
+    env_file: .env
+    environment:
+      DEFAULT_USER:       ${PGADMIN_DEFAULT_EMAIL}
+      DEFAULT_PASSWORD:   ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_PORT:       ${PGADMIN_PORT:-5050}
+    ports:
+      - "${PGADMIN_PORT:-5050}:${PGADMIN_PORT:-5050}"
+    networks:
+      - back
   federation:
-      build:                ./federation-docker
-      container_name:       stellar-federation
-      volumes:
-        - ~/stellar/federation:/opt/federation
-      restart:              unless-stopped
-      depends_on:
-        - federationpostgres
-      env_file: .env
-      environment:
-        FEDERATION_PORT:    ${FEDERATION_PORT:-8801}
-        POSTGRES_USER:      ${POSTGRES_USER}
-        POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
-        POSTGRES_DB:        ${POSTGRES_DB:-federationdb}
-        FEDERATION_DB_TYPE: postgres
-        FEDERATION_HOME:    /opt/federation
-        FEDERATION_DB_DSN:  "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@federationpostgres/federationdb?sslmode=disable"
-      ports:
-        - "${FEDERATION_PORT:-8801}:${FEDERATION_PORT:-8801}"
-      networks:
-          - default
+    build:                ./federation-docker
+    container_name:       stellar-federation
+    volumes:
+      - ~/stellar/federation:/opt/federation
+    restart:              unless-stopped
+    depends_on:
+      - federationpostgres
+    env_file: .env
+    environment:
+      FEDERATION_PORT:    ${FEDERATION_PORT:-8801}
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+      POSTGRES_DB:        ${POSTGRES_DB:-federationdb}
+      FEDERATION_DB_TYPE: postgres
+      FEDERATION_HOME:    /opt/federation
+      FEDERATION_DB_DSN:  "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@federationpostgres/federationdb?sslmode=disable"
+    ports:
+      - "${FEDERATION_PORT:-8801}:${FEDERATION_PORT:-8801}"
+    networks:
+      - back
+
+networks:
+  back:
